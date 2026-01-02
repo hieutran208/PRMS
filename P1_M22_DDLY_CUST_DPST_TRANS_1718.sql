@@ -88,7 +88,6 @@ BEGIN
 
     P1_BSM_PROG_EXEC_LOG(v_program_id, v_program_type_name, v_step_code, v_step_desc, v_time, sql%rowcount, NULL, NULL) ;
 
-    COMMIT ;
     ----------------------------------------------------------------------------
     --  1.2 Replicate data from three days ago to two days ago
     ----------------------------------------------------------------------------
@@ -123,7 +122,7 @@ BEGIN
 
     P1_BSM_PROG_EXEC_LOG(v_program_id, v_program_type_name, v_step_code, v_step_desc, v_time, sql%rowcount, NULL, NULL) ;
 
-    COMMIT ;
+    COMMIT;
     ----------------------------------------------------------------------------
     --  1.3 Delete Historical Data
     ----------------------------------------------------------------------------
@@ -155,7 +154,7 @@ BEGIN
           v_time         := SYSDATE ;
 
           P1_BSM_PROG_EXEC_LOG(v_program_id, v_program_type_name, v_step_code, v_step_desc, v_time, sql%rowcount, NULL, NULL) ;
-
+          
           COMMIT ;
           ----------------------------------------------------------------------------
 
@@ -203,15 +202,7 @@ BEGIN
                   T1.PCF_ID,
                   T1.DISPLAY_ORDER AS INPT_DATA_SEQ_NUM,
                   T1.BAS_YMD AS RPLC_DATA_BAS_DAY,
-                  CASE WHEN EXISTS (SELECT 1
-                                        FROM   TBSM_INPT_RPT_SUBMIT_L T2
-                                        WHERE  T2.PCF_ID        = T1.PCF_ID
-                                        AND    T2.INPT_RPT_ID   = 'G32_003_TTGS'
-                                        AND    T2.BTCH_BAS_DAY  < v_st_date_01
-                                        AND    T2.DATA_BAS_DAY  = T1.BAS_YMD
-                                        ) 
-                            THEN 'Y'
-                            ELSE 'N' END AS RPLC_DATA_YN,
+                  'N' AS RPLC_DATA_YN,
                   T1.TX_CD_ID AS CUST_ID,
                   CASE WHEN T1.GENDER_CODE IN ('M', 'F') THEN CASE WHEN T1.IS_MEMBER = '1' THEN '1'
                                                                    WHEN T1.IS_MEMBER = '2' THEN '3'
@@ -237,7 +228,7 @@ BEGIN
                   T1.OPEN_DATE AS OPN_DAY,
                   T1.DUE_DATE AS MTRT_DAY,
                   T1.INT_RATE AS ACTL_IR
-           FROM   (SELECT T1.BAS_YMD, T1.PCF_ID, NVL(T1.CUSTOMER_CODE, 'XXXX') AS TX_CD_ID, T1.GENDER_CODE, T1.TERM_CODE, T1.OPEN_DATE, T1.DUE_DATE, T1.INT_RATE, SUM(T1.DPST_CUR_BAL) AS DPST_BAL, MAX(T1.DISPLAY_ORDER) AS DISPLAY_ORDER, T1.IS_MEMBER
+           FROM   (SELECT T1.BAS_YMD, T1.PCF_ID, NVL(T1.CUSTOMER_CODE, 'XXXX') AS TX_CD_ID, T1.GENDER_CODE, T1.TERM_CODE, T1.OPEN_DATE, T1.DUE_DATE, T1.INT_RATE, SUM(T1.DPST_CUR_BAL) AS DPST_BAL, MAX(T1.DISPLAY_ORDER) AS DISPLAY_ORDER, MAX(T1.IS_MEMBER) AS IS_MEMBER
                    FROM   TB06_G32_003_TTGS_A T1 INNER JOIN (SELECT PCF_ID
                                                         FROM   TBSM_INPT_RPT_SUBMIT_L
                                                         WHERE  BTCH_BAS_DAY     = v_st_date_01
@@ -247,7 +238,7 @@ BEGIN
                                                        ) T2
                                                     ON T2.PCF_ID = T1.PCF_ID
                    WHERE  T1.BAS_YMD = loop_bas_day.BAS_DAY
-                   GROUP BY T1.BAS_YMD, T1.PCF_ID, NVL(T1.CUSTOMER_CODE, 'XXXX'), T1.GENDER_CODE, T1.TERM_CODE, T1.OPEN_DATE, T1.DUE_DATE, T1.INT_RATE, T1.IS_MEMBER
+                   GROUP BY T1.BAS_YMD, T1.PCF_ID, NVL(T1.CUSTOMER_CODE, 'XXXX'), T1.GENDER_CODE, T1.TERM_CODE, T1.OPEN_DATE, T1.DUE_DATE, T1.INT_RATE
                   ) T1
           ),
           DATA_SET AS
@@ -352,7 +343,7 @@ BEGIN
 
           P1_BSM_PROG_EXEC_LOG(v_program_id, v_program_type_name, v_step_code, v_step_desc, v_time, sql%rowcount, NULL, NULL) ;
 
-          COMMIT ;
+          COMMIT;
           ----------------------------------------------------------------------------
 
           v_cnt := v_cnt+sql%rowcount;
@@ -377,7 +368,6 @@ BEGIN
     v_time         := SYSDATE ;
 
     P1_BSM_PROG_EXEC_LOG(v_program_id, v_program_type_name, v_step_code, v_step_desc, v_time, NULL, NULL, NULL) ;
-    COMMIT;
     ----------------------------------------------------------------------------
     --  EXCEPTION
     ----------------------------------------------------------------------------

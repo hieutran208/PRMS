@@ -1,20 +1,20 @@
-create or replace PROCEDURE            "P4_M22_MMLY_PCF_DPST_TRANS_1718"
+create or replace PROCEDURE            "P4_M23_MMLY_BAL_SHET_1718"
                  ( p_wkdate    IN  CHAR DEFAULT NULL
                  , p_stdate_01 IN  CHAR DEFAULT NULL
                  , p_eddate_01 IN  CHAR DEFAULT NULL
                  )
 IS
     /*--------------------------------------------------------------------------
-     * PROGRAM ID    : P4_M22_MMLY_PCF_DPST_TRANS_1718
-     * PROGRAM NAME  : A program for insert data to TM22_MMLY_PCF_DPST_TRANS_A
-     * SOURCE TABLE  : TB06_G32_010_TTGS_A
-     * TARGET TABLE  : TM22_MMLY_PCF_DPST_TRANS_A
+     * PROGRAM ID    : P4_M23_MMLY_BAL_SHET_1718
+     * PROGRAM NAME  : A program for insert data to TM23_MMLY_BAL_SHET_A
+     * SOURCE TABLE  : TB02_G32_020_TTGS_02_A
+     * TARGET TABLE  : TM23_MMLY_BAL_SHET_A
      * PROGRAMER     : HIEU
-     * LAST MODIFICATION DATE : 2025-12-15
+     * LAST MODIFICATION DATE : 2025-12-23
      * UNIQUENESS    : N/A
      * COMMENTS      : N/A
     ----------------------------------------------------------------------------
-     * Revision History : 2025-12-15 : Create
+     * Revision History : 2025-12-23 : Create
      * Revision History :
     --------------------------------------------------------------------------*/
     ----------------------------------------------------------------------------
@@ -24,7 +24,7 @@ IS
     v_st_date_01              CHAR(8) DEFAULT NULL ;
     v_end_date_01             CHAR(8) DEFAULT NULL ;
 
-    v_program_id              VARCHAR2(100) DEFAULT 'P4_M22_MMLY_PCF_DPST_TRANS_1718' ;
+    v_program_id              VARCHAR2(100) DEFAULT 'P4_M23_MMLY_BAL_SHET_1718' ;
     v_program_type_name       VARCHAR2(100) DEFAULT 'Stored Procedure' ;
     v_step_code               VARCHAR2(3) ;
     v_step_desc               VARCHAR2(100) ;
@@ -54,13 +54,14 @@ BEGIN
     ----------------------------------------------------------------------------
     --  1.1 Delete Historical Data
     ----------------------------------------------------------------------------
+
     DELETE
-     FROM TM22_MMLY_PCF_DPST_TRANS_A
+      FROM TM23_MMLY_BAL_SHET_A
      WHERE BAS_YM IN (SELECT DISTINCT TRIM(DATA_BAS_DAY) AS BAS_YM
                       FROM   TBSM_INPT_RPT_SUBMIT_L
                       WHERE  BTCH_BAS_DAY = v_st_date_01
-                      AND    INPT_RPT_ID = 'G32_010_TTGS'
-                     );
+                      AND    INPT_RPT_ID  = 'G32_020_TTGS_02'
+                      );
 
     ----------------------------------------------------------------------------
     --  Transaction Log
@@ -70,79 +71,46 @@ BEGIN
     v_time         := SYSDATE ;
 
     P1_BSM_PROG_EXEC_LOG(v_program_id, v_program_type_name, v_step_code, v_step_desc, v_time, sql%rowcount, NULL, NULL) ;
+    
     COMMIT ;
     ----------------------------------------------------------------------------
     --  1.2 Inserting Data verification results
     ----------------------------------------------------------------------------
 
-    INSERT INTO TM22_MMLY_PCF_DPST_TRANS_A
+    INSERT INTO TM23_MMLY_BAL_SHET_A
     (   BAS_YM
        ,PCF_ID
-       ,CI_CD
-       ,PCF_VS_CI_DPST_TYP_CD
-       ,DPST_TRM_CD
-       ,DPST_BAL
-       ,DPST_IR
-       ,INT_MULTY_DPST_BAL
+       ,PCF_COA_ID
+       ,ON_OFF_TYP_CD
+       ,OPN_DR_BAL
+       ,OPN_CR_BAL
+       ,INCR_DR_BAL
+       ,INCR_CR_BAL
+       ,CLO_DR_BAL
+       ,CLO_CR_BAL
        ,TRGT_DATA_LST_MOD_TM
     )
     SELECT BAS_YM,
            PCF_ID,
-           '01901001' AS CI_CD,  /* 01901001 = Co-op Bank, XXXXXXXX = Other Credit Institution */
-           '1' AS PCF_VS_CI_DPST_TYP_CD, /* Settlement desposit */
-           'ZZZ' AS DPST_TRM_CD, /* Khac(Others) */
-           SUM(DPST_CUR_BAL) AS DPST_BAL,
-           SUM(INT_RATE *DPST_CUR_BAL) / DPST_CUR_BAL AS DPST_IR,
-           SUM(DPST_CUR_BAL * INT_RATE) AS INT_MULTY_DPST_BAL,
+           TO_CHAR(ACCOUNT_LEVEL) AS PCF_COA_CD,
+           CASE WHEN SUBSTR(ACCOUNT_CODE,1,1) = '9' THEN '2'
+                ELSE '1' 
+                END AS ON_OFF_TYP_CD,
+           OPENING_DEBIT_BAL,
+           OPENING_CREDIT_BAL,
+           THIS_PERIOD_DEBIT_BAL,
+           THIS_PERIOD_CREDIT_BAL,
+           CLOSING_DEBIT_BAL,
+           CLOSING_CREDIT_BAL,
            SYSTIMESTAMP
-    FROM  TB06_G32_010_TTGS_A
+    FROM   TB02_G32_020_TTGS_02_A
     WHERE  BAS_YM IN (SELECT DISTINCT TRIM(DATA_BAS_DAY) AS BAS_YM
                       FROM   TBSM_INPT_RPT_SUBMIT_L
                       WHERE  BTCH_BAS_DAY = v_st_date_01
-                      AND    INPT_RPT_ID = 'G32_010_TTGS'
-                     )
-    AND    DPST_CUR_BAL > 0
-    GROUP BY BAS_YM, PCF_ID
+                      AND    INPT_RPT_ID  = 'G32_020_TTGS_02'
+                      )
+    AND    (OPENING_DEBIT_BAL <> 0 OR OPENING_CREDIT_BAL <> 0 OR THIS_PERIOD_DEBIT_BAL <> 0 OR THIS_PERIOD_CREDIT_BAL <> 0 OR CLOSING_DEBIT_BAL <> 0 OR CLOSING_CREDIT_BAL <> 0);
 
-    UNION ALL
-
-    SELECT BAS_YM,
-           PCF_ID,
-           '01901001' AS CI_CD, /* 01901001 = Co-op Bank, XXXXXXXX = Other Credit Institution */
-           '2' AS PCF_VS_CI_DPST_TYP_CD, /* Reconciliation deposit */
-           TO_CHAR(TO_NUMBER(REPLACE(TERM_CODE, ',', '.'))) AS DPST_TRM_CD,
-           SUM(DPST_CUR_BAL) AS DPST_BAL,
-           SUM(INT_RATE *DPST_CUR_BAL) / DPST_CUR_BAL AS DPST_IR,
-           SUM(DPST_CUR_BAL * INT_RATE) AS INT_MULTY_DPST_BAL,
-           SYSTIMESTAMP
-    FROM   TB06_G32_010_TTGS_A
-    WHERE  BAS_YM IN (SELECT DISTINCT TRIM(DATA_BAS_DAY) AS BAS_YM
-                      FROM   TBSM_INPT_RPT_SUBMIT_L
-                      WHERE  BTCH_BAS_DAY = v_st_date_01
-                      AND    INPT_RPT_ID = 'G32_010_TTGS'
-                     )
-    AND    DPST_CUR_BAL > 0
-    GROUP BY BAS_YM, PCF_ID, TO_CHAR(TO_NUMBER(REPLACE(TERM_CODE, ',', '.')))
-
-    UNION ALL
-
-    SELECT BAS_YM,
-           PCF_ID,
-           '01901001' AS CI_CD, /* 01901001 = Co-op Bank, XXXXXXXX = Other Credit Institution */
-           '3' AS PCF_VS_CI_DPST_TYP_CD, /* Other deposits */
-           'ZZZ' AS DPST_TRM_CD,
-           SUM(DPST_CUR_BAL) AS DPST_BAL,
-           SUM(INT_RATE *DPST_CUR_BAL) / DPST_CUR_BAL  AS DPST_IR,
-           SUM(DPST_CUR_BAL * INT_RATE) AS INT_MULTY_DPST_BAL,
-           SYSTIMESTAMP
-    FROM   TB06_G32_010_TTGS_A
-    WHERE  BAS_YM IN (SELECT DISTINCT TRIM(DATA_BAS_DAY) AS BAS_YM
-                      FROM   TBSM_INPT_RPT_SUBMIT_L
-                      WHERE  BTCH_BAS_DAY = v_st_date_01
-                      AND    INPT_RPT_ID = 'G32_010_TTGS'
-                     )
-    AND    DPST_CUR_BAL > 0
-    GROUP BY BAS_YM, PCF_ID;
     ----------------------------------------------------------------------------
     --  Transaction Log
     ----------------------------------------------------------------------------

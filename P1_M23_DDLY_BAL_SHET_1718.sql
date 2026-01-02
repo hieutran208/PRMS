@@ -116,7 +116,7 @@ BEGIN
           v_time         := SYSDATE ;
 
           P1_BSM_PROG_EXEC_LOG(v_program_id, v_program_type_name, v_step_code, v_step_desc, v_time, sql%rowcount, NULL, NULL) ;
-
+          
           COMMIT ;
           ----------------------------------------------------------------------------
 
@@ -159,14 +159,16 @@ BEGIN
           )
           SELECT BAS_YMD,
                  PCF_ID,
-                 CASE WHEN TRIM(PCF_COA_CD) = 'ZZZZZZZ' THEN '0' ELSE PCF_COA_CD END AS PCF_COA_CD,
-                 ON_OFF_TYP_CD,
-                 OPN_DR_BAL,
-                 OPN_CR_BAL,
-                 INCR_DR_BAL,
-                 INCR_CR_BAL,
-                 CLO_DR_BAL,
-                 CLO_CR_BAL,
+                 TO_CHAR(ACCOUNT_LEVEL) AS PCF_COA_CD,
+                 CASE WHEN SUBSTR(ACCOUNT_CODE,1,1) = '9' THEN '2'
+                      ELSE '1' 
+                      END AS ON_OFF_TYP_CD,
+                 OPENING_DEBIT_BAL,
+                 OPENING_CREDIT_BAL,
+                 THIS_PERIOD_DEBIT_BAL,
+                 THIS_PERIOD_CREDIT_BAL,
+                 CLOSING_DEBIT_BAL,
+                 CLOSING_CREDIT_BAL,
                  SYSTIMESTAMP
           FROM   TB02_G32_020_TTGS_01_A
           WHERE  BAS_YMD = loop_bas_day.BAS_DAY
@@ -177,7 +179,7 @@ BEGIN
                             AND    DATA_BAS_DAY     = loop_bas_day.BAS_DAY
                             GROUP BY PCF_ID
                            )
-          AND    (OPN_DR_BAL <> 0 OR OPN_CR_BAL <> 0 OR INCR_DR_BAL <> 0 OR INCR_CR_BAL <> 0 OR CLO_DR_BAL <> 0 OR CLO_CR_BAL <> 0);
+          AND    (OPENING_DEBIT_BAL <> 0 OR OPENING_CREDIT_BAL <> 0 OR THIS_PERIOD_DEBIT_BAL <> 0 OR THIS_PERIOD_CREDIT_BAL <> 0 OR CLOSING_DEBIT_BAL <> 0 OR CLOSING_CREDIT_BAL <> 0);
 
           ----------------------------------------------------------------------------
           --  Transaction Log
@@ -188,7 +190,8 @@ BEGIN
 
           P1_BSM_PROG_EXEC_LOG(v_program_id, v_program_type_name, v_step_code, v_step_desc, v_time, sql%rowcount, NULL, NULL) ;
 
-          COMMIT ;
+          COMMIT;
+
           ----------------------------------------------------------------------------
 
           v_cnt := v_cnt+sql%rowcount;
@@ -223,7 +226,7 @@ BEGIN
            FROM   TM23_DDLY_BAL_SHET_A W1
            WHERE  W1.BAS_DAY = loop_delete_set.BAS_DAY
            AND    W1.PCF_ID  = loop_delete_set.PCF_ID
-           AND    W1.BAS_DAY||W1.PCF_ID NOT IN (SELECT T1.BAS_DAY||T3.PCF_ID
+           AND    W1.BAS_DAY||W1.PCF_ID NOT IN (SELECT T1.BAS_DAY||T1.PCF_ID
                                                 FROM   TSPF_G32_020_TTGS_01_X T1 INNER JOIN (SELECT K1.PREV_WRK_DAY, K2.DATA_BAS_DAY, K1.BAS_DAY, K2.PCF_ID
                                                                                                         FROM   TM00_DDLY_CAL_D K1 INNER JOIN (SELECT DATA_BAS_DAY, PCF_ID
                                                                                                                                               FROM   TBSM_INPT_RPT_SUBMIT_L
@@ -240,17 +243,16 @@ BEGIN
                                                                                                     ON T2.BAS_DAY = T1.BAS_DAY
                                                                                                    AND T2.PCF_ID  = T1.PCF_ID
                                                                                             INNER JOIN TM00_PCF_D T3
-                                                                                                    ON T3.PCF_ID = T1.PCF_ID
-                                                GROUP BY T1.BAS_DAY||T3.PCF_ID
+                                                                                                    ON T1.PCF_ID = T1.PCF_ID
+                                                GROUP BY T1.BAS_DAY||T1.PCF_ID
                                                );
-                                               
+
           ----------------------------------------------------------------------------
           --  Transaction Log
           ----------------------------------------------------------------------------
           v_time         := SYSDATE ;
 
           P1_BSM_PROG_EXEC_LOG(v_program_id, v_program_type_name, v_step_code, v_step_desc||loop_delete_set.BAS_DAY, v_time, sql%rowcount, NULL, NULL) ;
-
           COMMIT ;
           ----------------------------------------------------------------------------
 
@@ -312,7 +314,7 @@ BEGIN
 
           P1_BSM_PROG_EXEC_LOG(v_program_id, v_program_type_name, v_step_code, v_step_desc, v_time, sql%rowcount, NULL, NULL) ;
 
-          COMMIT ;
+          COMMIT;
           ----------------------------------------------------------------------------
 
           v_cnt := v_cnt+sql%rowcount;
@@ -337,6 +339,7 @@ BEGIN
     v_time         := SYSDATE ;
 
     P1_BSM_PROG_EXEC_LOG(v_program_id, v_program_type_name, v_step_code, v_step_desc, v_time, NULL, NULL, NULL) ;
+
     ----------------------------------------------------------------------------
     --  EXCEPTION
     ----------------------------------------------------------------------------

@@ -88,7 +88,7 @@ BEGIN
     v_time         := SYSDATE ;
 
     P1_BSM_PROG_EXEC_LOG(v_program_id, v_program_type_name, v_step_code, v_step_desc, v_time, sql%rowcount, NULL, NULL) ;
-
+    
     COMMIT ;
     ----------------------------------------------------------------------------
     --  1.2 Replicate data from three days ago to two days ago
@@ -168,7 +168,7 @@ BEGIN
           v_time         := SYSDATE ;
 
           P1_BSM_PROG_EXEC_LOG(v_program_id, v_program_type_name, v_step_code, v_step_desc, v_time, sql%rowcount, NULL, NULL) ;
-
+          
           COMMIT ;
           ----------------------------------------------------------------------------
 
@@ -247,15 +247,16 @@ BEGIN
                            END) AS RMTRT_LN_TRM_CD,
                   MAX(T1.ECONOMIC_SECTOR_CODE) AS ES_CD,
                   MAX(CASE WHEN T1.COLL_TYPE_CODE = '201' THEN 'Sổ tiền gửi tại QTDND'
-                           WHEN SUBSTR(T1.COLL_TYPE_CODE,1,1) = '4' THEN 'Bất Động Sản'
-                           WHEN SUBSTR(T1.COLL_TYPE_CODE,1,1) IN ('8', '9') THEN 'Tín chấp, không có Tài sản đảm bảo'
+                           WHEN SUBSTR(T1.COLL_TYPE_CODE,1,1) = '4' THEN 'Bất động sản'
+                           WHEN SUBSTR(T1.COLL_TYPE_CODE,1,1) IN ('8', '9') THEN 'Tín chấp, không có tài sản đảm bảo'
                            ELSE 'Tài sản đảm bảo khác' END) AS COLL_TYP_INFO,
                   MAX(CASE WHEN T1.COLL_TYPE_CODE = '201' THEN  '02'
                            WHEN SUBSTR(T1.COLL_TYPE_CODE,1,1) = '4' THEN '01'
                            WHEN SUBSTR(T1.COLL_TYPE_CODE,1,1) IN ('8', '9') THEN '00'
                            ELSE '03' END) AS COLL_TYP_CD,
                   CASE WHEN SUM(T1.DISBURSE_AMT) > 0 THEN '1'
-                           ELSE '5' END AS LN_TRANS_TYP_CD,
+                           ELSE '5' 
+                           END AS LN_TRANS_TYP_CD,
                   MAX(CASE WHEN T1.PREV_DEBT_GROUP IS NOT NULL THEN CASE WHEN T1.BAS_YMD <= T1.NEXT_PRINCIPAL_PAY_DATE
                                                                              AND T1.NEXT_PRINCIPAL_PAY_DATE <= T1.EXTEND_MATURITY_DATE
                                                                              AND T1.BAS_YMD <= T1.NEXT_INT_PAY_DATE 
@@ -283,7 +284,8 @@ BEGIN
                   MAX(T1.TOTAL_LOAN_AMT) AS LN_CNTR_AMT,
                   MAX(T1.OUTSTND_BAL) AS LN_BAL,
                   CASE WHEN SUM(T1.DISBURSE_AMT) > 0 THEN SUM(T1.DISBURSE_AMT)
-                        ELSE 0 END AS TRANS_AMT,
+                        ELSE 0 
+                        END AS TRANS_AMT,
                   MAX(T1.COLL_VAL_VALUE) AS COLL_VAL_AMT,
                   MAX(T1.SPEC_PROVISION_TO_MAKE) AS SPEC_PRVS_AMT,
                   MAX(T1.LOAN_DATE) AS OPN_DAY,
@@ -429,7 +431,7 @@ BEGIN
 
           P1_BSM_PROG_EXEC_LOG(v_program_id, v_program_type_name, v_step_code, v_step_desc, v_time, sql%rowcount, NULL, NULL) ;
 
-          COMMIT ;
+          COMMIT;
           ----------------------------------------------------------------------------
 
           v_cnt := v_cnt+sql%rowcount;
@@ -455,6 +457,7 @@ BEGIN
     v_time         := SYSDATE ;
 
     P1_BSM_PROG_EXEC_LOG(v_program_id, v_program_type_name, v_step_code, v_step_desc, v_time, NULL, NULL, NULL) ;
+
     ----------------------------------------------------------------------------
     --  EXCEPTION
     ----------------------------------------------------------------------------

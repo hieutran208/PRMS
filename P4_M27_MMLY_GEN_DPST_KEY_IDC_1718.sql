@@ -115,7 +115,7 @@ BEGIN
           v_time         := SYSDATE ;
 
           P1_BSM_PROG_EXEC_LOG(v_program_id, v_program_type_name, v_step_code, v_step_desc, v_time, sql%rowcount, NULL, NULL) ;
-
+          
           COMMIT ;
           ----------------------------------------------------------------------------
           --  1.2 Inserting Data by TM27_MMLY_GEN_DPST_KEY_IDC_A
@@ -407,7 +407,7 @@ BEGIN
 
           P1_BSM_PROG_EXEC_LOG(v_program_id, v_program_type_name, v_step_code, v_step_desc, v_time, sql%rowcount, NULL, NULL) ;
 
-          COMMIT ;
+          COMMIT;
 
           EXCEPTION
           WHEN OTHERS THEN
@@ -439,7 +439,6 @@ BEGIN
 
           P1_BSM_PROG_EXEC_LOG(v_program_id, v_program_type_name, v_step_code, v_step_desc, v_time, sql%rowcount, NULL, NULL) ;
 
-          COMMIT ;
           ----------------------------------------------------------------------------
           --  1.2 Inserting Data by TM27_MMLY_GEN_DPST_KEY_IDC_A
           ----------------------------------------------------------------------------
@@ -695,7 +694,7 @@ BEGIN
 
           P1_BSM_PROG_EXEC_LOG(v_program_id, v_program_type_name, v_step_code, v_step_desc, v_time, sql%rowcount, NULL, NULL) ;
 
-          COMMIT ;
+          COMMIT;
 
           EXCEPTION
           WHEN OTHERS THEN
@@ -708,6 +707,7 @@ BEGIN
                end;
     End;
     END LOOP;
+
     ----------------------------------------------------------------------------
     --  Write Program End Log
     ----------------------------------------------------------------------------

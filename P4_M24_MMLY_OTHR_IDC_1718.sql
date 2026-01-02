@@ -48,7 +48,7 @@ IS
     FROM   (SELECT DISTINCT TRIM(DATA_BAS_DAY) AS BAS_YM
             FROM   TBSM_INPT_RPT_SUBMIT_L
             WHERE  BTCH_BAS_DAY >= v_st_date_01
-            AND    INPT_RPT_ID IN ('G035841','G031341','G32_007_TTGS')
+            AND    INPT_RPT_ID IN ('G32_020_TTGS_02','G32_007_TTGS')
 
             UNION
 
@@ -98,7 +98,7 @@ BEGIN
           v_time         := SYSDATE ;
 
           P1_BSM_PROG_EXEC_LOG(v_program_id, v_program_type_name, v_step_code, v_step_desc, v_time, sql%rowcount, NULL, NULL) ;
-
+          
           COMMIT ;
           ----------------------------------------------------------------------------
           DBMS_OUTPUT.put_line(1);
@@ -270,7 +270,8 @@ BEGIN
 
           P1_BSM_PROG_EXEC_LOG(v_program_id, v_program_type_name, v_step_code, v_step_desc, v_time, sql%rowcount, NULL, NULL) ;
 
-          COMMIT ;
+          COMMIT;
+
           ----------------------------------------------------------------------------
 
           EXCEPTION

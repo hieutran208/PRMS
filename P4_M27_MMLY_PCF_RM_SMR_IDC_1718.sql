@@ -102,7 +102,7 @@ BEGIN
           v_time         := SYSDATE ;
 
           P1_BSM_PROG_EXEC_LOG(v_program_id, v_program_type_name, v_step_code, v_step_desc, v_time, sql%rowcount, NULL, NULL) ;
-
+          
           COMMIT ;
           ----------------------------------------------------------------------------
 
@@ -198,13 +198,6 @@ BEGIN
            WHERE  T1.BAS_YM = loop_bas_day.BAS_YM
           ),
 
-          (SELECT  T1.BAS_YM, T1.PCF_ID
-           FROM   (SELECT BAS_YM, PCF_ID
-                   FROM   TM23_MMLY_BAL_SHET_A
-                   WHERE  BAS_YM = loop_bas_day.BAS_YM
-                   GROUP BY BAS_YM, PCF_ID
-                  ) T1
-          ),
 */
           REPORT_02_DTL AS
           (SELECT BAS_YM
@@ -411,33 +404,33 @@ BEGIN
                 ,T1.CAR_VAL
                 ,T1.TDP_VS_OWNR_EQT_VAL
                 ,T1.OWNR_EQT_VS_CCAP_VAL
-                ,T4.THIS_MM_SLVNCY_RISK_SCR_WVAL
-                ,T4.PREV_MM_SLVNCY_RISK_SCR_WVAL
-                ,T3.SLVNCY_RISK_MISS_IDC_CNT
+                ,T3.THIS_MM_SLVNCY_RISK_SCR_WVAL
+                ,T3.PREV_MM_SLVNCY_RISK_SCR_WVAL
+                ,T2.SLVNCY_RISK_MISS_IDC_CNT
                 ,T1.G35_BAD_DBT_VS_TOT_RISK_LN_VAL
                 ,T1.TOT_RISK_VS_BAD_DBT_PRVS_VAL
                 ,T1.SNGL_CUST_BIG_LN_VS_EQT_VAL
                 ,T1.RLT_GRP_BIG_LN_VS_EQT_VAL
                 ,T1.ACRD_INT_VS_TOT_RISK_G1_LN_VAL
-                ,T4.THIS_MM_CR_RISK_SCR_WVAL
-                ,T4.PREV_MM_CR_RISK_SCR_WVAL
-                ,T3.CR_RISK_MISS_IDC_CNT
+                ,T3.THIS_MM_CR_RISK_SCR_WVAL
+                ,T3.PREV_MM_CR_RISK_SCR_WVAL
+                ,T2.CR_RISK_MISS_IDC_CNT
                 ,T1.L12M_NWD_LQDTY_OVR100P_VAL
                 ,T1.L12M_N7WD_LQDTY_OVR100P_VAL
                 ,T1.STFND_USE_MTLTLD_VAL
                 ,T1.TOT_CBV_BOR_VS_TOT_AST_VAL
-                ,T4.THIS_MM_LQDTY_RISK_SCR_WVAL
-                ,T4.PREV_MM_LQDTY_RISK_SCR_WVAL
-                ,T3.LQDTY_RISK_MISS_IDC_CNT
+                ,T3.THIS_MM_LQDTY_RISK_SCR_WVAL
+                ,T3.PREV_MM_LQDTY_RISK_SCR_WVAL
+                ,T2.LQDTY_RISK_MISS_IDC_CNT
                 ,T1.TOT_IHAND_CSH_VS_TOT_AST_VAL
                 ,T1.RISK_FIX_AST_VAL
                 ,T1.RISK_OTHR_INST_SVG_VAL
-                ,T4.THIS_MM_OPRT_RISK_SCR_WVAL
-                ,T4.PREV_MM_OPRT_RISK_SCR_WVAL
-                ,T3.OPRT_RISK_MISS_IDC_CNT
-                ,T5.THIS_MM_TOT_RISK_SCR_WVAL
-                ,T5.PREV_MM_TOT_RISK_SCR_WVAL
-                ,T5.TOT_RISK_MISS_IDC_CNT
+                ,T3.THIS_MM_OPRT_RISK_SCR_WVAL
+                ,T3.PREV_MM_OPRT_RISK_SCR_WVAL
+                ,T2.OPRT_RISK_MISS_IDC_CNT
+                ,T4.THIS_MM_TOT_RISK_SCR_WVAL
+                ,T4.PREV_MM_TOT_RISK_SCR_WVAL
+                ,T4.TOT_RISK_MISS_IDC_CNT
                 ,SYSTIMESTAMP
           FROM  REPORT_02_DTL T1 LEFT OUTER JOIN REPORT_02_MISS_IDC T2
                                           ON T2.BAS_YM = T1.BAS_YM
@@ -458,7 +451,7 @@ BEGIN
 
           P1_BSM_PROG_EXEC_LOG(v_program_id, v_program_type_name, v_step_code, v_step_desc, v_time, sql%rowcount, NULL, NULL) ;
 
-          COMMIT ;
+          COMMIT;
           ----------------------------------------------------------------------------
 
           v_cnt := v_cnt+sql%rowcount;
@@ -474,6 +467,7 @@ BEGIN
                end;
     End;
     END LOOP;
+
 
     ----------------------------------------------------------------------------
     --  Write Program End Log

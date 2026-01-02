@@ -71,7 +71,7 @@ BEGIN
     v_time         := SYSDATE ;
 
     P1_BSM_PROG_EXEC_LOG(v_program_id, v_program_type_name, v_step_code, v_step_desc, v_time, sql%rowcount, NULL, NULL) ;
-
+    
     COMMIT ;
     ----------------------------------------------------------------------------
     --  1.2 Inserting Data verification results
@@ -249,3 +249,4 @@ BEGIN
     P1_BSM_PROG_EXEC_LOG(v_program_id, v_program_type_name, v_step_code, v_step_desc, v_time, NULL, TO_CHAR(SQLCODE), SQLERRM) ;
 
 END ;
+/

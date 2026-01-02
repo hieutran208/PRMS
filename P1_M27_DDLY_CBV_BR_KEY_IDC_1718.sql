@@ -146,8 +146,8 @@ BEGIN
           v_time         := SYSDATE ;
 
           P1_BSM_PROG_EXEC_LOG(v_program_id, v_program_type_name, v_step_code, v_step_desc, v_time, sql%rowcount, NULL, NULL) ;
-
-          COMMIT ;
+          
+          COMMIT;
           ----------------------------------------------------------------------------
 
           INSERT INTO TM27_DDLY_CBV_BR_KEY_IDC_A
@@ -172,7 +172,7 @@ BEGIN
                   A.PCF_ID,
                   A.TOTAL_CURRENT_MEMBERS AS TOT_PCF_MBR_NUM_CNT
            FROM   TB01_G32_016_TTGS_A A INNER JOIN TM00_MMLY_CAL_D B
-                                           ON B.BAS_YM = A.BAS_YMQ
+                                           ON B.BAS_YM = A.BAS_YM
 
            UNION ALL
 
@@ -180,7 +180,7 @@ BEGIN
                   A.PCF_ID,
                   A.TOTAL_CURRENT_MEMBERS AS TOT_PCF_MBR_NUM_CNT
            FROM   TB01_G32_016_TTGS_A A INNER JOIN TM00_MMLY_CAL_D B
-                                           ON B.BAS_YM = A.BAS_YMQ
+                                           ON B.BAS_YM = A.BAS_YM
 
            UNION ALL
 
@@ -188,7 +188,7 @@ BEGIN
                   A.PCF_ID,
                   A.TOTAL_CURRENT_MEMBERS AS TOT_PCF_MBR_NUM_CNT
            FROM   TB01_G32_016_TTGS_A A INNER JOIN TM00_MMLY_CAL_D B
-                                           ON B.BAS_YM = A.BAS_YMQ
+                                           ON B.BAS_YM = A.BAS_YM
           ),
           FROM_TM27_DDLY_PCF_KEY_IDC_A AS
           (SELECT BAS_DAY
@@ -1275,7 +1275,7 @@ BEGIN
                    ) XX
            WHERE XX.RNK_NUM BETWEEN 1 AND 3
           ),
-          FROM_TB07_G034821_A_3M_SET1 AS
+          FROM_TB07_G32_005_TTGS_A_3M_SET1 AS
           (SELECT XX.BAS_DAY,
                   XX.CBV_BR_CD,
                   '1' AS TOP_BTOM_TYP_CD,
@@ -1338,19 +1338,19 @@ BEGIN
                    ) XX
            WHERE XX.RNK_NUM BETWEEN 1 AND 3
           ),
-          FROM_TB07_G034821_A_3M_SET2 AS
+          FROM_TB07_G32_005_TTGS_A_3M_SET2 AS
           (SELECT T1.BAS_DAY AS BAS_DAY1,
                   T1.TOP_BTOM_TYP_CD,
                   T1.CBV_BR_CD,
                   T1.RNK_NUM,
                   MAX(T2.BAS_DAY) AS BAS_DAY2,
                   MAX(T3.BAS_DAY) AS BAS_DAY3
-           FROM   FROM_TB07_G034821_A_3M_SET1 T1 LEFT OUTER JOIN FROM_TB07_G034821_A_3M_SET1 T2
+           FROM   FROM_TB07_G32_005_TTGS_A_3M_SET1 T1 LEFT OUTER JOIN FROM_TB07_G32_005_TTGS_A_3M_SET1 T2
                                                               ON T2.BAS_DAY <= TO_CHAR(ADD_MONTHS(TO_DATE(T1.BAS_DAY, 'YYYYMMDD'), -1), 'YYYYMMDD')
                                                              AND T2.CBV_BR_CD = T1.CBV_BR_CD
                                                              AND T2.TOP_BTOM_TYP_CD = T1.TOP_BTOM_TYP_CD
                                                              AND T2.RNK_NUM = T1.RNK_NUM
-                                                 LEFT OUTER JOIN FROM_TB07_G034821_A_3M_SET1 T3
+                                                 LEFT OUTER JOIN FROM_TB07_G32_005_TTGS_A_3M_SET1 T3
                                                               ON T3.BAS_DAY <= TO_CHAR(ADD_MONTHS(TO_DATE(T1.BAS_DAY, 'YYYYMMDD'), -2), 'YYYYMMDD')
                                                              AND T3.CBV_BR_CD = T1.CBV_BR_CD
                                                              AND T3.TOP_BTOM_TYP_CD = T1.TOP_BTOM_TYP_CD
@@ -1400,17 +1400,17 @@ BEGIN
                                                      CASE WHEN T4.NXT_WRK_DAY_LQDTY_RTO IS NOT NULL THEN 1 ELSE 0 END
                                                     ), 3)
                                      END AS L3M_NXT_WRK_DAY_LQDTY_RTO
-                         FROM   FROM_TB07_G034821_A_3M_SET2 T1 INNER JOIN FROM_TB07_G034821_A_3M_SET1 T2
+                         FROM   FROM_TB07_G32_005_TTGS_A_3M_SET2 T1 INNER JOIN FROM_TB07_G32_005_TTGS_A_3M_SET1 T2
                                                                        ON T2.BAS_DAY = T1.BAS_DAY1
                                                                       AND T2.CBV_BR_CD = T1.CBV_BR_CD
                                                                       AND T2.TOP_BTOM_TYP_CD = T1.TOP_BTOM_TYP_CD
                                                                       AND T2.RNK_NUM = T1.RNK_NUM
-                                                               INNER JOIN FROM_TB07_G034821_A_3M_SET1 T3
+                                                               INNER JOIN FROM_TB07_G32_005_TTGS_A_3M_SET1 T3
                                                                        ON T3.BAS_DAY = T1.BAS_DAY2
                                                                       AND T3.CBV_BR_CD = T1.CBV_BR_CD
                                                                       AND T3.TOP_BTOM_TYP_CD = T1.TOP_BTOM_TYP_CD
                                                                       AND T3.RNK_NUM = T1.RNK_NUM
-                                                               INNER JOIN FROM_TB07_G034821_A_3M_SET1 T4
+                                                               INNER JOIN FROM_TB07_G32_005_TTGS_A_3M_SET1 T4
                                                                        ON T4.BAS_DAY = T1.BAS_DAY3
                                                                       AND T4.CBV_BR_CD = T1.CBV_BR_CD
                                                                       AND T4.TOP_BTOM_TYP_CD = T1.TOP_BTOM_TYP_CD
@@ -1448,17 +1448,17 @@ BEGIN
                                                      CASE WHEN T4.NXT_WRK_DAY_LQDTY_RTO IS NOT NULL THEN 1 ELSE 0 END
                                                     ), 3)
                                      END AS L3M_NXT_WRK_DAY_LQDTY_RTO
-                         FROM   FROM_TB07_G034821_A_3M_SET2 T1 INNER JOIN FROM_TB07_G034821_A_3M_SET1 T2
+                         FROM   FROM_TB07_G32_005_TTGS_A_3M_SET2 T1 INNER JOIN FROM_TB07_G32_005_TTGS_A_3M_SET1 T2
                                                                        ON T2.BAS_DAY = T1.BAS_DAY1
                                                                       AND T2.CBV_BR_CD = T1.CBV_BR_CD
                                                                       AND T2.TOP_BTOM_TYP_CD = T1.TOP_BTOM_TYP_CD
                                                                       AND T2.RNK_NUM = T1.RNK_NUM
-                                                               INNER JOIN FROM_TB07_G034821_A_3M_SET1 T3
+                                                               INNER JOIN FROM_TB07_G32_005_TTGS_A_3M_SET1 T3
                                                                        ON T3.BAS_DAY = T1.BAS_DAY2
                                                                       AND T3.CBV_BR_CD = T1.CBV_BR_CD
                                                                       AND T3.TOP_BTOM_TYP_CD = T1.TOP_BTOM_TYP_CD
                                                                       AND T3.RNK_NUM = T1.RNK_NUM
-                                                               INNER JOIN FROM_TB07_G034821_A_3M_SET1 T4
+                                                               INNER JOIN FROM_TB07_G32_005_TTGS_A_3M_SET1 T4
                                                                        ON T4.BAS_DAY = T1.BAS_DAY3
                                                                       AND T4.CBV_BR_CD = T1.CBV_BR_CD
                                                                       AND T4.TOP_BTOM_TYP_CD = T1.TOP_BTOM_TYP_CD
@@ -1467,7 +1467,7 @@ BEGIN
                         )
                  ) XX
           ),
-          FROM_TB07_G034821_A_3M_SET3 AS
+          FROM_TB07_G32_005_TTGS_A_3M_SET3 AS
           (SELECT XX.BAS_DAY,
                   XX.CBV_BR_CD,
                   '1' AS TOP_BTOM_TYP_CD,
@@ -1572,17 +1572,17 @@ BEGIN
                                                      CASE WHEN T4.NXT_7_WRK_DAY_LQDTY_RTO IS NOT NULL THEN 1 ELSE 0 END
                                                     ), 3)
                                      END AS L3M_NXT_7_WRK_DAY_LQDTY_RTO
-                         FROM   FROM_TB07_G034821_A_3M_SET2 T1 INNER JOIN FROM_TB07_G034821_A_3M_SET3 T2
+                         FROM   FROM_TB07_G32_005_TTGS_A_3M_SET2 T1 INNER JOIN FROM_TB07_G32_005_TTGS_A_3M_SET3 T2
                                                                        ON T2.BAS_DAY = T1.BAS_DAY1
                                                                       AND T2.CBV_BR_CD = T1.CBV_BR_CD
                                                                       AND T2.TOP_BTOM_TYP_CD = T1.TOP_BTOM_TYP_CD
                                                                       AND T2.RNK_NUM = T1.RNK_NUM
-                                                               INNER JOIN FROM_TB07_G034821_A_3M_SET3 T3
+                                                               INNER JOIN FROM_TB07_G32_005_TTGS_A_3M_SET3 T3
                                                                        ON T3.BAS_DAY = T1.BAS_DAY2
                                                                       AND T3.CBV_BR_CD = T1.CBV_BR_CD
                                                                       AND T3.TOP_BTOM_TYP_CD = T1.TOP_BTOM_TYP_CD
                                                                       AND T3.RNK_NUM = T1.RNK_NUM
-                                                               INNER JOIN FROM_TB07_G034821_A_3M_SET3 T4
+                                                               INNER JOIN FROM_TB07_G32_005_TTGS_A_3M_SET3 T4
                                                                        ON T4.BAS_DAY = T1.BAS_DAY3
                                                                       AND T4.CBV_BR_CD = T1.CBV_BR_CD
                                                                       AND T4.TOP_BTOM_TYP_CD = T1.TOP_BTOM_TYP_CD
@@ -1620,17 +1620,17 @@ BEGIN
                                                      CASE WHEN T4.NXT_7_WRK_DAY_LQDTY_RTO IS NOT NULL THEN 1 ELSE 0 END
                                                     ), 3)
                                      END AS L3M_NXT_7_WRK_DAY_LQDTY_RTO
-                         FROM   FROM_TB07_G034821_A_3M_SET2 T1 INNER JOIN FROM_TB07_G034821_A_3M_SET3 T2
+                         FROM   FROM_TB07_G32_005_TTGS_A_3M_SET2 T1 INNER JOIN FROM_TB07_G32_005_TTGS_A_3M_SET3 T2
                                                                        ON T2.BAS_DAY = T1.BAS_DAY1
                                                                       AND T2.CBV_BR_CD = T1.CBV_BR_CD
                                                                       AND T2.TOP_BTOM_TYP_CD = T1.TOP_BTOM_TYP_CD
                                                                       AND T2.RNK_NUM = T1.RNK_NUM
-                                                               INNER JOIN FROM_TB07_G034821_A_3M_SET3 T3
+                                                               INNER JOIN FROM_TB07_G32_005_TTGS_A_3M_SET3 T3
                                                                        ON T3.BAS_DAY = T1.BAS_DAY2
                                                                       AND T3.CBV_BR_CD = T1.CBV_BR_CD
                                                                       AND T3.TOP_BTOM_TYP_CD = T1.TOP_BTOM_TYP_CD
                                                                       AND T3.RNK_NUM = T1.RNK_NUM
-                                                               INNER JOIN FROM_TB07_G034821_A_3M_SET3 T4
+                                                               INNER JOIN FROM_TB07_G32_005_TTGS_A_3M_SET3 T4
                                                                        ON T4.BAS_DAY = T1.BAS_DAY3
                                                                       AND T4.CBV_BR_CD = T1.CBV_BR_CD
                                                                       AND T4.TOP_BTOM_TYP_CD = T1.TOP_BTOM_TYP_CD
@@ -1757,6 +1757,7 @@ BEGIN
           P1_BSM_PROG_EXEC_LOG(v_program_id, v_program_type_name, v_step_code, v_step_desc, v_time, sql%rowcount, NULL, NULL) ;
 
           COMMIT ;
+
           ----------------------------------------------------------------------------
 
           EXCEPTION
@@ -1771,6 +1772,7 @@ BEGIN
     End;
     END LOOP;
 
+
     ----------------------------------------------------------------------------
     --  Write Program End Log
     ----------------------------------------------------------------------------
@@ -1780,7 +1782,6 @@ BEGIN
 
     P1_BSM_PROG_EXEC_LOG(v_program_id, v_program_type_name, v_step_code, v_step_desc, v_time, NULL, NULL, NULL) ;
 
-    COMMIT;
     ----------------------------------------------------------------------------
     --  Call P1_M27_DDLY_NTWK_KEY_IDC
     ----------------------------------------------------------------------------
@@ -1794,3 +1795,4 @@ BEGIN
     P1_BSM_PROG_EXEC_LOG(v_program_id, v_program_type_name, v_step_code, v_step_desc, v_time, NULL, TO_CHAR(SQLCODE), SQLERRM) ;
 
 END ;
+/

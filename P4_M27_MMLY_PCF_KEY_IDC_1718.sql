@@ -131,7 +131,7 @@ BEGIN
           v_time         := SYSDATE ;
 
           P1_BSM_PROG_EXEC_LOG(v_program_id, v_program_type_name, v_step_code, v_step_desc, v_time, sql%rowcount, NULL, NULL) ;
-
+          
           COMMIT ;
           ----------------------------------------------------------------------------
 
@@ -287,26 +287,20 @@ BEGIN
            GROUP BY T1.BAS_YM, T1.PCF_ID
           ),
           FROM_TB01_G32_018_TTGS_A_BASE AS
-          (SELECT T1.BAS_YM,
-                  T1.PCF_ID,
-                  NVL(T2.PCF_CR_OFCR_NUM_CNT, 0) AS PCF_CR_OFCR_NUM_CNT
-           FROM   (SELECT B.BAS_YM, A.PCF_ID
-                   FROM   TB01_G32_018_TTGS_A A INNER JOIN TM00_MMLY_CAL_D B
-                                                   ON B.BAS_YM = A.BAS_YM
-                   GROUP BY B.BAS_YM, A.PCF_ID
-                  ) T1 LEFT OUTER JOIN (SELECT B.BAS_YM,
-                                               A.PCF_ID,
-                                               COUNT(DISTINCT A.ID_CARD) AS PCF_CR_OFCR_NUM_CNT
-                                        FROM   TB01_G32_018_TTGS_A A INNER JOIN TM00_MMLY_CAL_D B
-                                                                        ON B.BAS_YM = A.BAS_YM
-                                                              /*  INNER JOIN TM00_PCF_POSITION_D C
-                                                                        ON C.IS_CREDIT_OFFICER = '1'
-                                                                       AND UPPER(TRIM(A.ID_CARD)) = UPPER(TRIM(C.PCF_POSITION_NAME)) */
-                                        WHERE  A.ID_CARD IS NOT NULL
-                                        GROUP BY B.BAS_YM, A.PCF_ID
-                                       ) T2
-                                    ON T2.BAS_YM = T1.BAS_YM
-                                   AND T2.PCF_ID = T1.PCF_ID
+          (SELECT BAS_YM,
+                  PCF_ID,
+                  NVL(PCF_CR_OFCR_NUM_CNT, 0) AS PCF_CR_OFCR_NUM_CNT
+           FROM   (SELECT B.BAS_YM,
+                          A.PCF_ID,
+                          COUNT(DISTINCT A.ID_CARD) AS PCF_CR_OFCR_NUM_CNT
+                          FROM   TB01_G32_018_TTGS_A A INNER JOIN TM00_MMLY_CAL_D B
+                                                               ON B.BAS_YM = A.BAS_YM
+                                                   /*  INNER JOIN TM00_PCF_POSITION_D C
+                                                               ON C.IS_CREDIT_OFFICER = '1'
+                                                               AND UPPER(TRIM(A.ID_CARD)) = UPPER(TRIM(C.PCF_POSITION_NAME)) */
+                          WHERE  A.ID_CARD IS NOT NULL
+                          GROUP BY B.BAS_YM, A.PCF_ID
+                  ) 
           ),
           FROM_TB01_G32_018_TTGS_A AS
           (SELECT T3.BAS_YM,
@@ -374,7 +368,7 @@ BEGIN
                   SUM(CASE WHEN PCF_COA_ID IN ('13111', '13121') THEN CLO_DR_BAL ELSE 0 END) AS CBV_SVG_AMT,
 
                   SUM(CASE WHEN PCF_COA_ID IN ('13119', '13129') THEN CLO_DR_BAL ELSE 0 END) AS OTHR_INST_SVG_AMT,
-                  SUM(CASE WHEN PCF_COA_ID = '13129' THEN CLO_DR_BAL ELSE 0 END) AS OTHR_INST_TRM_DPST_AMT, /* 2022:06:07 Add Column */
+                  SUM(CASE WHEN PCF_COA_ID = '13129' THEN CLO_DR_BAL ELSE 0 END) AS OTHR_INST_TRM_DPST_AMT,
 
                   SUM(CASE WHEN PCF_COA_ID = '10' THEN CLO_DR_BAL ELSE 0 END) AS IN_HAND_CSH_AMT,
                   SUM(CASE WHEN PCF_COA_ID = '34401' THEN CLO_DR_BAL ELSE 0 END) AS CNTRBT_CBV_LT_CAP_AMT,
@@ -772,7 +766,7 @@ BEGIN
 
           P1_BSM_PROG_EXEC_LOG(v_program_id, v_program_type_name, v_step_code, v_step_desc, v_time, sql%rowcount, NULL, NULL) ;
 
-          COMMIT ;
+          COMMIT;
           ----------------------------------------------------------------------------
 
           v_cnt := v_cnt+sql%rowcount;

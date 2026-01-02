@@ -316,7 +316,7 @@ BEGIN
                   B.TOT_PCF_MBR_NUM_CNT AS AGT_VAL
            FROM   (SELECT BAS_DAY
                    FROM   FROM_TM27_DDLY_PCF_KEY_IDC_A
-                   GROUP BY BAS_DAY) A INNER JOIN (SELECT BAS_YM
+                   GROUP BY BAS_DAY) A INNER JOIN (SELECT BAS_YM, ROUND(AVG(TOT_PCF_MBR_NUM_CNT), 0) AS TOT_PCF_MBR_NUM_CNT
                                                    FROM   FROM_G32_016_TTGS T1 
                                                    GROUP BY BAS_YM
                                                   ) B

@@ -11,11 +11,11 @@ IS
                        TB01_G32_016_TTGS_A
      * TARGET TABLE  : TM27_DDLY_PCF_REF_IDC_A
      * PROGRAMER     : HIEU
-     * LAST MODIFICATION DATE : 2019-12-18
+     * LAST MODIFICATION DATE : 2025-12-18
      * UNIQUENESS    : N/A
      * COMMENTS      : N/A
     ----------------------------------------------------------------------------
-     * Revision History : 2019-12-18 : Create
+     * Revision History : 2025-12-18 : Create
      * Revision History :
     --------------------------------------------------------------------------*/
     ----------------------------------------------------------------------------
@@ -146,7 +146,7 @@ BEGIN
           v_time         := SYSDATE ;
 
           P1_BSM_PROG_EXEC_LOG(v_program_id, v_program_type_name, v_step_code, v_step_desc, v_time, sql%rowcount, NULL, NULL) ;
-
+          
           COMMIT ;
           ----------------------------------------------------------------------------
 
@@ -928,7 +928,8 @@ BEGIN
 
           P1_BSM_PROG_EXEC_LOG(v_program_id, v_program_type_name, v_step_code, v_step_desc, v_time, sql%rowcount, NULL, NULL) ;
 
-          COMMIT ;
+          COMMIT;
+
           ----------------------------------------------------------------------------
 
           v_cnt := v_cnt+sql%rowcount;
@@ -944,6 +945,7 @@ BEGIN
                end;
     End;
     END LOOP;
+
     ----------------------------------------------------------------------------
     --  Write Program End Log
     ----------------------------------------------------------------------------
@@ -952,6 +954,7 @@ BEGIN
     v_time         := SYSDATE ;
 
     P1_BSM_PROG_EXEC_LOG(v_program_id, v_program_type_name, v_step_code, v_step_desc, v_time, NULL, NULL, NULL) ;
+
     ----------------------------------------------------------------------------
     --  EXCEPTION
     ----------------------------------------------------------------------------
@@ -961,3 +964,4 @@ BEGIN
     P1_BSM_PROG_EXEC_LOG(v_program_id, v_program_type_name, v_step_code, v_step_desc, v_time, NULL, TO_CHAR(SQLCODE), SQLERRM) ;
 
 END ;
+/

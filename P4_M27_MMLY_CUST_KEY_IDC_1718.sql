@@ -73,7 +73,7 @@ BEGIN
     v_time         := SYSDATE ;
 
     P1_BSM_PROG_EXEC_LOG(v_program_id, v_program_type_name, v_step_code, v_step_desc, v_time, NULL, NULL, NULL) ;
-    
+
     ----------------------------------------------------------------------------
     --  1.1 Inserting Data
     ----------------------------------------------------------------------------
@@ -94,7 +94,7 @@ BEGIN
           v_time         := SYSDATE ;
 
           P1_BSM_PROG_EXEC_LOG(v_program_id, v_program_type_name, v_step_code, v_step_desc, v_time, sql%rowcount, NULL, NULL) ;
-
+          
           COMMIT ;
           ----------------------------------------------------------------------------
           INSERT INTO TM27_MMLY_CUST_KEY_IDC_A
@@ -143,7 +143,7 @@ BEGIN
 
            SELECT PCF_ID, '3' AS CUST_TYP_CD, TX_CD_ID AS CUST_ID
            FROM   TM00_MBR_D
-           WHERE  BAS_YR = SUBSTR(loop_bas_day.BAS_YM, 1, 4)
+           WHERE  BAS_YM = loop_bas_day.BAS_YM
            AND    CNTRBT_MSHP_CAP_AMT > 0
            GROUP BY PCF_ID, TX_CD_ID
           ),
@@ -219,6 +219,7 @@ BEGIN
           P1_BSM_PROG_EXEC_LOG(v_program_id, v_program_type_name, v_step_code, v_step_desc, v_time, sql%rowcount, NULL, NULL) ;
 
           COMMIT ;
+
           ----------------------------------------------------------------------------
 
           v_cnt := v_cnt+sql%rowcount;
@@ -234,6 +235,7 @@ BEGIN
                end;
     End;
     END LOOP;
+
     ----------------------------------------------------------------------------
     --  Write Program End Log
     ----------------------------------------------------------------------------
